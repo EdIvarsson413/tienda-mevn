@@ -1,0 +1,36 @@
+table {
+    text-align: center;
+    /* 
+    background-color: #212121;
+    width: 100%;
+    border-radius: 5px;
+    border-collapse: collapse;
+    overflow-y: auto;
+    -webkit-box-shadow: 3px 7px 31px -7px rgba(0, 0, 0, 0.82);
+    -moz-box-shadow: 3px 7px 31px -7px rgba(0, 0, 0, 0.82);
+    box-shadow: 3px 7px 31px -7px rgba(0, 0, 0, 0.82); 
+    */
+}
+
+
+/* thead {
+    font-size: 1.1rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.10);
+}
+
+tbody > tr:hover {
+    background-color: rgba(255, 255, 255, 0.10);
+}
+
+th {
+    padding: 5px;
+}
+
+tr > td {
+    padding: 10px;
+} */
+
+
+.fondo {
+    background-color: rgba(0, 0, 0, 0.8);
+}
