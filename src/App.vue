@@ -4,9 +4,10 @@
 
     <v-main class="bg-grey-darken-3">
       <v-container>
-        <RouterView />
+        <RouterView :key="$route.fullPath"/>
       </v-container>
     </v-main>
+    
   </v-app>
 </template>
 

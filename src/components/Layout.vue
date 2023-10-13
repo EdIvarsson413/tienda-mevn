@@ -13,7 +13,10 @@
 
                 <!-- Campo de texto -->
                 <v-col sm="12" md="6" class="d-flex justify-center align-center">
-                    <v-text-field color="white" label="Buscar" prepend-inner-icon="mdi-magnify" variant="outlined" />
+                    <v-text-field color="white" label="Buscar" prepend-inner-icon="mdi-magnify" 
+                        variant="outlined" v-model="buscar" autocomplete="off"
+                        @keyup.enter="$router.push({ name: 'buscar', params: { nombre: buscar } })"
+                    />
                 </v-col>
 
                 <!-- Botones -->
@@ -55,14 +58,18 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import BotonLink from './ui/BotonLink.vue'
 
-// Importar el sotre de autenticacion
+// Importaciones
 const auth = useAuthStore();
-const usuario = ref(null)
+const usuario = ref(null);
+const router = useRouter()
+
+//Variables
+const buscar = ref('');
 
 // Al iniciar la app se extraen los datos del usuario actual
 onMounted(async () => {
@@ -79,6 +86,13 @@ onMounted(async () => {
         console.log(error);
     }
 })
+
+
+// Metodos y monitoreo
+const realizarBusqueda = () => {
+    router.push({ name: 'buscar', params: { nombre: buscar } });
+    window.location.reload()
+}
 
 // Se automatiza el tamaño del navbar
 const tamaño = computed(() => {

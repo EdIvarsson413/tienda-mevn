@@ -13,6 +13,13 @@ const router = createRouter({
       meta: { title: 'Inicio - Catalogo' }
     },
     {
+      path: '/buscar/:nombre',
+      name: 'buscar',
+      component: () => import('../views/BuscarView.vue'),
+      meta: { title: 'Resultados - ' }
+    }
+    ,
+    {
       path: '/registro',
       name: 'registro',
       component: () => import('../views/RegistroView.vue'),
@@ -41,7 +48,13 @@ const router = createRouter({
       name: 'promos',
       component: () => import('../views/AdministradorPromosView.vue'),
       meta: { title: 'Administrador - Promociones', requiresAdminRole : 'admin' },
-    }
+    },
+    {
+      path: '/libro/:id',
+      name: 'detalle-libro',
+      component: () => import('../views/LibroView.vue'),
+      meta: { title: 'Libro - ' },
+    },
   ]
 })
 
@@ -52,7 +65,7 @@ router.beforeEach( async (to, from, next) => {
   // Buscando el otro campo meta
   const requiresAdminRole = to.matched.some( url => url.meta.requiresAdminRole );
 
-  // Verificar si el usuario tiene el rol de administrador
+  // Middleware para verificar rol del usuario
   const auth = useAuthStore()
   
   // Cuando el usuario entra al panel del admin
@@ -71,7 +84,6 @@ router.beforeEach( async (to, from, next) => {
     // Se avanza al siguiente middleware si la ruta no esta protegida
     next();
   }
-
 })
 
 export default router

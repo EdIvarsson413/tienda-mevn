@@ -34,3 +34,13 @@ tr > td {
 .fondo {
     background-color: rgba(0, 0, 0, 0.8);
 }
+
+.card-mq {
+    height: 450px;
+}
+
+@media (min-width: 600px ) and ( max-width: 960px ) {
+    .card-mq {
+        height: 110px;
+    }
+}

@@ -35,7 +35,13 @@
 
                 <!-- Acciones del card -->
                 <v-card-actions>
-                    <router-link :to="/*`/libro/${$props.libro._id}`*/'/'" class="w-100">
+                    <router-link 
+                        :to="{ 
+                            name: 'detalle-libro', 
+                            params: { id: $props.libro._id }
+                        }" 
+                        class="w-100"
+                    >
                         <v-btn 
                             class="w-100 mt-2"
                             color="orange-darken-1"

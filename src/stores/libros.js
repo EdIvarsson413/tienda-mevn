@@ -88,11 +88,41 @@ export const useLibrosStore = defineStore('libros', () => {
             .catch( error => {} )
     }
 
+    const obtenerLibroId = async (id) => {
+        let objLibro = {}
+
+        try {
+            const { data } = await axios(`${import.meta.env.VITE_BACKEND_URL}/api/libros/id/${id}`);
+            objLibro = data;
+        } catch (error) {
+            console.log(error);
+        }
+
+        return objLibro
+    }
+
+    const obtenerLibroNombre = async (nombre) => {
+        let objLibro = {}
+
+        try {
+            const data  = await axios(`${import.meta.env.VITE_BACKEND_URL}/api/libros/${nombre}`);
+            objLibro = data.data;
+            objLibro.codigo = data.status
+        } catch (error) {
+            objLibro.msg = error.response.data.msg
+            objLibro.codigo = error.response.status
+        }
+
+        return objLibro
+    }
+
     return {
         catalogo,
         libro,
         agregarLibro,
         editarLibro,
-        eliminarLibro
+        eliminarLibro,
+        obtenerLibroId,
+        obtenerLibroNombre
     }
 })

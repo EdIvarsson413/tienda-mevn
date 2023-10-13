@@ -17,9 +17,12 @@ Como dependencias secundarias se usan :
     - Buscar la mejor solución para reducuir la cantidad de clases o props de Vuetify.
     - Componentizar elementos que requieren más de 10 lineas de código.
 + Reducuir código
-    - Ligado a las mejoras de UI, se busca un modo de reducir código con componentes o archivos externos que realizane operaciones auxiliares. Pinia para tener operaciones de con los estados y evitar redudancia, propiedades computadas para mejor gestión de cambios y limpieza en el HTML.
-+ Aplicar mejores practicas
+    - Ligado a las mejoras de UI, se busca un modo de reducir código con componentes o archivos externos que realizan operaciones auxiliares. Está Pinia para tener operaciones de con los estados y evitar redudancia, propiedades computadas para mejor gestión de cambios y limpieza en el HTML.
++ Aplicar mejores prácticas
     - Con mejores conociemientos sobre el framework, se hace un mejor empleo de directivas, metodos y reactividad tanto en el HTML como en los scripts.
+    + Navegación en las páginas:
+        - No abusar tanto del uso de `window.location.reload()`.
+        - No recargar completamente para cambiar el state que necesite de peticiones al servidor.
 
 
 ## Vue 3 + Vite
