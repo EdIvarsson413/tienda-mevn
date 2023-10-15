@@ -17,8 +17,7 @@ const router = createRouter({
       name: 'buscar',
       component: () => import('../views/BuscarView.vue'),
       meta: { title: 'Resultados - ' }
-    }
-    ,
+    },
     {
       path: '/registro',
       name: 'registro',

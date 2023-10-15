@@ -40,6 +40,4 @@ onMounted( async () => {
 const encontroLibro = computed(() => {
     return libro.value && libro.value.codigo === 200
 })
-
-
 </script>

@@ -11,7 +11,7 @@
             <v-col md="5">
                 <v-img
                     max-width="205"
-                    :src="`https://firebasestorage.googleapis.com/v0/b/libreriascastor-ecffa.appspot.com/o/portadas%2F${$props.libro.imagen}?alt=media&token=d4359645-f199-48c6-b6ee-0c9e2a163fd4&_gl=1*wzhjyg*_ga*NjM3MTQwODIwLjE2Njk0MjQwMDA.*_ga_CW55HF8NVT*MTY4NjM2MDc2Ni4xMS4xLjE2ODYzNjE2ODQuMC4wLjA.`"
+                    :src="imgLibro( $props.libro.imagen )"
                     :alt="`imagen ${$props.libro.nombre}`"
                 />
             </v-col>
@@ -46,9 +46,8 @@
                             class="w-100 mt-2"
                             color="orange-darken-1"
                             variant="outlined"
-                        >
-                            Ver o comprar
-                        </v-btn>
+                            text="Ver o comprar"
+                        />
                     </router-link>
                 </v-card-actions>
             </v-col>
@@ -57,6 +56,8 @@
 </template>
 
 <script setup>
+import imgLibro from '../js/linkImg'
+
 defineProps({
     libro: Object
 })
