@@ -1,88 +1,85 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import InicioView from '../views/InicioView.vue'
 import { useAuthStore } from '../stores/auth'
-import { error } from '../js/Notificacion'
+import requieresRole from '../js/requieresRole'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'incio',
+      name: 'inicio',
       component: InicioView,
-      meta: { title: 'Inicio - Catalogo' }
+      meta: { titulo: 'Inicio - Catalogo' }
     },
     {
       path: '/buscar/:nombre',
       name: 'buscar',
       component: () => import('../views/BuscarView.vue'),
-      meta: { title: 'Resultados - ' }
+      meta: { titulo: 'Resultados - ' }
     },
     {
       path: '/registro',
       name: 'registro',
       component: () => import('../views/RegistroView.vue'),
-      meta: { title: 'Registrarse' }
+      meta: { titulo: 'Registrarse' }
     },
     {
       path: '/iniciar-sesion',
       name: 'iniciar-sesion',
       component: () => import('../views/IniciarSessionView.vue'),
-      meta: { title: 'Iniciar Sesión' }
+      meta: { titulo: 'Iniciar Sesión' }
     },
     {
       path: '/confirmar/:token',
       name: 'registrarse',
       component: () => import('../views/ConfirmarView.vue'),
-      meta: { title: 'Confirmar usuario' }
+      meta: { titulo: 'Confirmar usuario' }
     },
     {
       path: '/admin/libros',
       name: 'admin',
       component: () => import('../views/AdministradorLibrosView.vue'),
-      meta: { title: 'Administrador - Libros', requiresAdminRole : 'admin' },
+      meta: { titulo: 'Administrador - Libros', requiresAdminRole : 'admin' },
     },
     {
       path: '/admin/promociones',
       name: 'promos',
       component: () => import('../views/AdministradorPromosView.vue'),
-      meta: { title: 'Administrador - Promociones', requiresAdminRole : 'admin' },
+      meta: { titulo: 'Administrador - Promociones', requiresAdminRole : 'admin' },
     },
     {
       path: '/libro/:id',
       name: 'detalle-libro',
       component: () => import('../views/LibroView.vue'),
-      meta: { title: 'Libro - ' },
+      meta: { titulo: 'Libro - ' },
     },
+    {
+      path: '/carrito',
+      name: 'carrito',
+      component: () => import('../views/CarritoView.vue'),
+      meta: { titulo: 'Carrito', requiresUserRole: 'user' }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../views/NotFound.vue'),
+      meta: { titulo: 'Página no encontrada' }
+    }
   ]
 })
 
 router.beforeEach( async (to, from, next) => {
   // Meter titulo a la pagina
-  document.title = to.meta.title
+  document.title = to.meta.titulo
 
-  // Buscando el otro campo meta
+  // Buscando campos meta
   const requiresAdminRole = to.matched.some( url => url.meta.requiresAdminRole );
-
-  // Middleware para verificar rol del usuario
+  const requiresUserRole = to.matched.some( url => url.meta.requiresUserRole );
   const auth = useAuthStore()
   
-  // Cuando el usuario entra al panel del admin
-  if (requiresAdminRole) {
-    const usuario = await auth.obtenerUsuario();
-    
-    // Verificando si hay un usuario y su rol es de administrador
-    if (usuario && usuario.role === 'admin') {
-      next();
-    } else {
-      // Si el usuario no es un administrador o no hay un usuario autenticado
-      next({ name: 'iniciar-sesion' });
-      error( 'Error :(', 'Acceso denegado, solo administradores' )
-    }
-  } else {
-    // Se avanza al siguiente middleware si la ruta no esta protegida
-    next();
-  }
+  // Llamada al middleware
+  await requieresRole( next, auth ,requiresAdminRole, requiresUserRole );
 })
 
 export default router

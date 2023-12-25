@@ -6,12 +6,13 @@ table {
     background-color: rgba(0, 0, 0, 0.8);
 }
 
+.card--hover:hover{
+    transform: scale(1.1);
+    transition: transform 0.3s ease-in-out;
+}
+
 .card-descuento-mq {
-    height: 450px;
-    
-    /* position: relative;
-    top: 50%;
-    transform: translateY(-50%); */
+    height: 458px;
 }
 
 .img-ajuste {
@@ -32,6 +33,38 @@ table {
     top: 50%;
 }
 
+.comentarios-ajuste {
+    /* Hasta que no hayan 5 comentarios, no se aplican estas propiedades */
+    height: 405px;
+    overflow-y: auto;
+}
+
+.listaPedido {
+    /* Hasta que no hayan 4 libros en la lista, no se aplican estas propiedades */
+    height: 590px;
+    overflow-y: auto;
+}
+
+.margen-total {
+    margin-top: 8.07px;
+}
+
+.resaltar-item:hover {
+    transform: scale(1.04);
+    transition: transform 1s ease-out;
+}
+
+.carrito-ajuste {
+    width: 75%;
+}
+
+.libro-detalle-ajuste {
+    width: auto;
+}
+
+.nohay-oferta-ajuste {
+    margin-top: 150px;
+}
 @media (min-width: 600px ) and ( max-width: 960px ) {
     .navbar-container-mq {
         position: relative;
@@ -40,7 +73,7 @@ table {
     }
 
     .card-descuento-mq {
-        height: 110px;
+        height: 400px;
     }
 
     .card-detalle-mq {
@@ -61,5 +94,73 @@ table {
         position: static;
         top: auto;
         transform: none;
+    }
+
+    .carrito-ajuste {
+        width: 100%;
+    }
+}
+
+/* Carga de cubos */
+.cubes {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+}
+
+.cubes .sk-cube {
+    width: 33%;
+    height: 33%;
+    background-color: #fff;
+    float: left;
+    animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;
+}
+
+.cubes .sk-cube1 {
+    animation-delay: 0.2s;
+}
+
+.cubes .sk-cube2 {
+    animation-delay: 0.3s;
+}
+
+.cubes .sk-cube3 {
+    animation-delay: 0.4s;
+}
+
+.cubes .sk-cube4 {
+    animation-delay: 0.1s;
+}
+
+.cubes .sk-cube5 {
+    animation-delay: 0.2s;
+}
+
+.cubes .sk-cube6 {
+    animation-delay: 0.3s;
+}
+
+.cubes .sk-cube7 {
+    animation-delay: 0s;
+}
+
+.cubes .sk-cube8 {
+    animation-delay: 0.1s;
+}
+
+.cubes .sk-cube9 {
+    animation-delay: 0.2s;
+}
+
+@keyframes sk-cubeGridScaleDelay {
+
+    0%,
+    70%,
+    100% {
+        transform: scale3D(1, 1, 1);
+    }
+
+    35% {
+        transform: scale3D(0, 0, 1);
     }
 }

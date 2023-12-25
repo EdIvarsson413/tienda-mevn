@@ -1,4 +1,5 @@
 <template>
+    <!-- Presentacion de una tarjeta de aviso de confirmacion de cuenta de usuario -->
     <div class="d-flex justify-center">
         <v-card class="w-75 mt-10" color="grey-darken-4" :height="cambiarTamaño">
             <v-card-title v-if="err" class="text-h2 text-center text-red mt-8">{{ mensaje }}</v-card-title>
@@ -17,6 +18,8 @@ import { ref, onMounted, computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import axios from 'axios'
 
+
+// ----------- Importaciones ----------- //
 const route = useRoute();
 const { token } = route.params;
 const mensaje = ref('');
@@ -40,7 +43,10 @@ onMounted(() => {
     confirmarCuenta();
 });
 
-// Observaciones cuando se inicia el componente
+
+// ----------- Monitoreo ----------- //
+
+// Cambio de altura de la tajeta dependiendo del texto de respuesta
 const cambiarTamaño = computed(() => {
     return err.value ? 123 : 250;
 })

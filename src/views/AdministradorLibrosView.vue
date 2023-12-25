@@ -1,5 +1,5 @@
 <template>
-    <!-- Acciones (agregar, conteo d libros y agregar promocion) -->
+    <!-- Acciones (agregar, conteo de libros e ir a promociones) -->
     <v-btn-group 
         color="orange-darken-1" 
         density="comfortable" 
@@ -19,7 +19,7 @@
     </v-btn-group>
 
     <!-- Tabla de libros -->
-    <v-table height="510" class="mt-8" hover theme="dark">
+    <v-table :height="xl? 700 : 510" class="mt-8" :class="sm ? 'h-screen' : '' " hover theme="dark">
         <thead>
             <tr>
                 <th class="text-center w-25">Portada</th>
@@ -52,15 +52,21 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useDisplay } from 'vuetify'
+import { storage } from '../js/firebase'
+import { ref as refFirebase, deleteObject } from 'firebase/storage'
 import { useLibrosStore } from '../stores/libros'
 import Renglon from '../components/Renglon.vue'
 import LibroDialog from '../components/LibroDialog.vue'
 import { advertencia, confirmar } from '../js/Notificacion';
 
-// Importar store
-const libros = useLibrosStore();
 
-// Variables reactivas y no reacivas
+// ----------- Importaciones ----------- //
+const libros = useLibrosStore();
+const { sm, xl } = useDisplay()
+
+
+// ----------- Variables reactivas ----------- //
 const abrir = ref(false);
 const editar  = ref(false);
 const libroInicial = {
@@ -75,7 +81,8 @@ const libroInicial = {
     tokenPromo: ''
 }
 
-// Metodos
+
+// ----------- Funciones ----------- //
 const nuevoDialog = () => {
     // Abre el dialog, no se activa el modo de edicion y reinicia el state de libro
     abrir.value = true;
@@ -90,19 +97,22 @@ const editarDialog = (id) => {
 
     // Se busca el libro por su indice y se agregan los datos a la variable del store
     const index = libros.catalogo.findIndex( libro => libro._id === id );
-    libros.libro = libros.catalogo[index];
+    libros.libroEditar = libros.catalogo[index];
+    Object.assign( libros.libro, libroInicial )
 }
 
 // Aqui no se usa el dialog, en su lugar usa un swalaert
-const eliminarSwal = async ( id, nombre ) => {
+const eliminarSwal = async ( id, nombre, portada ) => {
     const resultado = await confirmar( nombre, `¿Estás seguro de eliminar ${nombre}?`, 'Si, eliminar' );
     
     if( resultado ){
         // Eliminar primero del state
         libros.catalogo = libros.catalogo.filter( libro => libro._id !== id);
-        console.log(libros.catalogo)
 
-        // Peticion para eliminar de la base de datos
+        // Eliminar portada en Firebase Storage
+        eliminarPortada( portada )
+
+        // Llamada a la API para eliminar el libro en servidor
         libros.eliminarLibro( id );
         return;
     }
@@ -117,7 +127,23 @@ const cerrarDialog = () => {
     editar.value =  false;
 }
 
-// Monitoreo
+// Eliminar imagen
+const eliminarPortada = async ( nombre ) => {
+    // Referencia al archivo
+    const portadaRef = refFirebase( storage, `portadas/${nombre}` )
+
+    // Eliminar archivo
+    deleteObject( portadaRef )
+        .then( () => {
+            console.log('eliminado')
+        })
+        .catch( error => {
+            console.log(error)
+        })
+}
+
+
+// ----------- Monitoreo ----------- //
 const cantidad = computed(() => {
     const cantLibros = libros.catalogo.length 
     if( cantLibros > 1 ) return `Hay ${cantLibros} libros`
@@ -129,13 +155,15 @@ const editando = computed(() => {
     // Verificando si el dialog esta en modo edicion y si ya se recogio un libro
     if( editar.value && libros.libro){
         return {
-            titulo: `Edición - ${libros.libro.nombre}`,
-            msjPortada: `La portada de este libro es: ${libros.libro.imagen}`,
+            titulo: `Edición - ${libros.libroEditar.nombre}`,
+            msjPortada: `La portada de este libro es: ${libros.libroEditar.imagen}`,
             btnTitulo: 'Editar Libro'
         }}
 
-    // Se devuelve un objeto para no tener problemas con los valores si está
-    // el modo de edicion activado, este objeto va a los placeholder del dialog
+    /**
+     * Se devuelve un objeto para no tener problemas con los valores si está
+     * el modo de edicion activado, este objeto va a los placeholder del dialog
+     */
     return {
         titulo: 'Agregar Nuevo Libro',
         msjPortada: 'No hay portada seleccionada',

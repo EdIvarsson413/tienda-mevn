@@ -1,6 +1,7 @@
 <template>
     <h1 class="text-center my-8 text-h3">Resultados en {{ $route.params.nombre }}</h1>
 
+    <!-- Resultados presentados en tarjeta -->
     <div class="d-flex justify-center">
         <CardLibro 
             v-if="encontroLibro"
@@ -16,11 +17,13 @@ import { useRoute } from 'vue-router'
 import { useLibrosStore } from '../stores/libros'
 import CardLibro from '../components/CardLibro.vue'
 
-// Importaciones
+
+// ----------- Importaciones ----------- //
 const route = useRoute();
 const libros = useLibrosStore();
 
-// Variables reactivas
+
+// ----------- Variables reactivas ----------- //
 const libro = ref(null);
 
 // Carga de datos al entrar a la pagina
@@ -36,7 +39,10 @@ onMounted( async () => {
     } catch( error ) { }
 })
 
-// Monitorea si ya cargó el libro y busca el codigo de la peticion
+
+// ----------- Monitoreo ----------- //
+
+// Si ya cargó el libro y busca el codigo de la peticion
 const encontroLibro = computed(() => {
     return libro.value && libro.value.codigo === 200
 })

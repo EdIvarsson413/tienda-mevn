@@ -1,5 +1,9 @@
 <template>
-    <v-card :class="[!verSinopis ? 'card-detalle-mq' : '']" color="grey-darken-4" elevation="5">
+    <v-card 
+        :class="[!verSinopis ? 'card-detalle-mq' : '']" 
+        color="grey-darken-4" 
+        elevation="5"
+    >
         <v-row v-if="!verSinopis">
             <!-- Portada -->
             <v-col md="6" sm="12">
@@ -7,26 +11,31 @@
                     class="img-ajuste"
                     max-width="300"
                     cover
-                    :src="imgLibro( $props.libro.imagen )"
-                    :alt="`imagen ${$props.libro.nombre}`"
+                    :src="imgLibro( libro.imagen )"
+                    :alt="`imagen ${libro.nombre}`"
                 />
             </v-col>
 
             <!-- Datos, especificar cantidad y estrellas -->
             <v-col md="6" sm="12" class="text-center detalles-ajuste">
+
+                <!-- Tiutlo del libro -->
                 <v-card-title class="text-center text-h5" style="white-space: normal; overflow: visible;">
-                    {{ $props.libro.nombre }}
+                    {{ libro.nombre }}
                 </v-card-title>
                 
+                <!-- Precio y autor -->
                 <div class="d-flex justify-center">
-                    <v-card-subtitle>${{ $props.libro.precio }}</v-card-subtitle>
-                    <v-card-subtitle>{{ $props.libro.autor }}</v-card-subtitle>
+                    <v-card-subtitle class="text-subtitle-1">${{ libro.precio }}</v-card-subtitle>
+                    <v-card-subtitle class="text-subtitle-1">{{ libro.autor }}</v-card-subtitle>
                 </div>
 
+                <!-- Saga -->
                 <v-card-title class="text-h5 my-6 text-white" style="white-space: normal; overflow: visible;">
-                    {{ $props.libro.saga }}
+                    {{ libro.saga }}
                 </v-card-title>
 
+                <!-- Boton para  ver sinopsis -->
                 <v-btn 
                     class="w-75 text-center"
                     variant="plain"
@@ -43,7 +52,8 @@
                     @decrementar="decrementar"
                     :desactivar="hayAdministrador"
                 />
-
+                
+                <!-- Accion de agregar al carrito -->
                 <v-btn
                     append-icon="mdi-cart"
                     text="Agregar al carrito"
@@ -51,10 +61,12 @@
                     color="orange-darken-1"
                     variant="outlined"
                     :disabled="hayAdministrador"
+                    @click="agregarApedidos"
                 />
+
                 <!-- Estrellas -->
                 <VotarEstrellas 
-                    :nombreLibro="$props.libro.nombre"
+                    :nombreLibro="libro.nombre"
                 />
             </v-col>
         </v-row>
@@ -65,26 +77,36 @@
                 variant="outlined"
                 color="orange-darken-1"
                 @click="verSinopis = !verSinopis"/>
-            <v-card-text class="text-justify text" v-html="sinopsis"/>
+
+                <!-- Sinopsis con \n formateados -->
+            <v-card-text class="text-justify" v-html="sinopsis"/>
         </div>
     </v-card>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import Stepper from '../ui/Stepper.vue'
 import VotarEstrellas from '../ui/VotarEstrellas.vue'
+import { useCompraStore } from '../../stores/compra'
 import imgLibro from '../../js/linkImg'
+import { ok, advertencia } from '../../js/Notificacion'
+
+// ----------- Importaciones ----------- //
+const compra = useCompraStore();
 
 const props = defineProps({
     libro: Object,
     usuario: Object
 })
-// Varaibles reactivas 
+
+
+// ----------- Variables reactivas ----------- //
 const contador = ref(0);
 const verSinopis = ref(false);
 
-// Metodos
+
+// ----------- Funciones ----------- //
 const incrementar = () => {
     if( contador.value < 5 ) 
         contador.value++;
@@ -95,7 +117,42 @@ const decrementar = () => {
         contador.value--;
 }
 
-// Monitoreo
+const agregarApedidos = () => {
+    // Validar que no haya 0 unidades en carrito
+    if( contador.value === 0 ) {
+        advertencia( 'Sin unidades', 'No has seleccionado unidades para llevar' );
+        return;
+    }
+
+    const itemListaIndex = compra.listaPedir.findIndex( item => item.id === props.libro._id )
+
+    if( itemListaIndex >= 0 ) {
+        // Solo suma las unidades si ya hay un libro en el carrito
+        const uni = compra.listaPedir[itemListaIndex]?.unidades;
+        compra.listaPedir[itemListaIndex].unidades = uni + contador.value;
+        advertencia( 'Editando', 'Ya está en el carrito, te sumamos las unidades ;)' );
+        return;
+    }
+
+
+    // Si no existe
+    const itemLista = {
+        id: props.libro._id,
+        nombre: props.libro.nombre,
+        precio: props.libro.precio,
+        unidades: contador.value,
+        portada: props.libro.imagen,
+        tokenPromo: props.libro.tokenPromo,
+        aplicoPromo: false
+    }
+
+    compra.listaPedir.push( itemLista )
+    ok( 'Agregando al carrito', 'Libro agregado al carrito' );
+}
+
+// ----------- Monitoreo ----------- //
+
+// Saber si se encuentra el administrador
 const hayAdministrador = computed(() =>{
     return props.usuario?.role === 'admin' || props.usuario === undefined
 })

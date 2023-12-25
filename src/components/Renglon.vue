@@ -3,7 +3,7 @@
         <!-- Portada -->
         <td class="d-flex justify-center h-100 pa-3">
             <v-img 
-                :src="`https://firebasestorage.googleapis.com/v0/b/libreriascastor-ecffa.appspot.com/o/portadas%2F${$props.libro.imagen}?alt=media`" 
+                :src="imgLibro( $props.libro.imagen )" 
                 max-width="150" 
                 max-height="150"
                 :alt="$props.libro.imagen"
@@ -38,7 +38,7 @@
                         variant="plain" 
                         color="orange-darken-1" 
                         icon="mdi-delete"
-                        @click="$emit('eliminar-swal', $props.libro._id, $props.libro.nombre)"
+                        @click="$emit('eliminar-swal', $props.libro._id, $props.libro.nombre, $props.libro.imagen)"
                     />
                 </template>
             </v-tooltip>
@@ -47,6 +47,7 @@
 </template>
 
 <script setup>
+import imgLibro from '../js/linkImg'
 defineProps({
     libro: {
         type: Object,

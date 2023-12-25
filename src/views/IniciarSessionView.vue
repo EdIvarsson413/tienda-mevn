@@ -2,6 +2,7 @@
     <v-card class="mx-auto mt-10" color="grey-darken-4" elevation="5" max-width="600">
         <v-card-title class="text-h5 text-center my-4">Iniciar Sesión</v-card-title>
 
+        <!-- Formulario -->
         <v-form autocomplete="off" class="px-5" @keyup.enter="handleSubmit">
             <v-text-field
                 class="mb-3"
@@ -39,13 +40,16 @@ import { reactive } from 'vue'
 import { error as errorAlert } from '../js/Notificacion' 
 import { useAuthStore } from '../stores/auth'
 
+
+// ----------- Importaciones ----------- //
 const auth = useAuthStore();
 
-// Campos del formulario
+// ----------- Variables del formulario ----------- //
 const usuario = reactive({
     correo: '',
     contraseña: ''
 })
+
 
 // Reglas del formulario
 const reglas = {
@@ -59,6 +63,8 @@ const reglas = {
     ]
 }
 
+
+// ----------- Funciones ----------- //
 const handleSubmit = () => {
     // Validacion de campos
     if( Object.values( usuario ).includes('') ) {

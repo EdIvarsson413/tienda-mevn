@@ -1,6 +1,6 @@
 <template>
     <v-card
-        class="card--hover ma-5"
+        class="card--hover ma-5 mx-sm-auto"
         color="grey-darken-4"
         elevation="5"
         width="379" 

@@ -1,10 +1,11 @@
-import { onMounted, reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import io from 'socket.io-client'
 import { ok, error as errorAlert } from '../js/Notificacion'
 
 export const useLibrosStore = defineStore('libros', () => {
-    //Varibales del store
+    // ----------- Variables del store ----------- //
     const catalogo = ref([])
     const libro = reactive({
         _id: '',
@@ -17,6 +18,20 @@ export const useLibrosStore = defineStore('libros', () => {
         tipo: '',
         tokenPromo: ''
     })
+    const libroEditar = reactive({
+        _id: '',
+        nombre: '',
+        saga: '',
+        autor: '',
+        precio: 0,
+        sinopsis: '',
+        imagen: '',
+        tipo: '',
+        tokenPromo: ''
+    })
+
+    // Socket.io
+    let socket;
 
     // Obtener libros al iniciar la app
     onMounted(() => {
@@ -27,7 +42,21 @@ export const useLibrosStore = defineStore('libros', () => {
             }catch(error) { console.log ( error ) }
         }
         obtenerLibros();
+
+        // Socket.io - iniciar sala
+        socket = io(import.meta.env.VITE_BACKEND_URL)
+        socket.emit('cargando libros', 'Cargando libros...')
     })
+
+    // Realizar eventos de sockets al entrar a la pagina
+    onMounted(() => {
+        socket.on('libro agregado', libro => {
+            catalogo.value.push(libro)
+        })
+    })
+
+
+    // ----------- Funciones ----------- //
 
     // Enviar un libro a la base de datos
     const agregarLibro = async () => {
@@ -49,6 +78,9 @@ export const useLibrosStore = defineStore('libros', () => {
         })
             .then( data => {
                 ok( 'Ok ;)', data.data.msg );
+
+                // Socket.io - emitir evento para buscar datos del libro agregado en serviror
+                socket.emit('nuevo libro', libro.nombre)
             })
             .catch( error => {
                 errorAlert( 'Error :(', error.response.data.msg ); 
@@ -88,6 +120,7 @@ export const useLibrosStore = defineStore('libros', () => {
             .catch( error => {} )
     }
 
+    // Obtener libro por id
     const obtenerLibroId = async (id) => {
         let objLibro = {}
 
@@ -101,6 +134,7 @@ export const useLibrosStore = defineStore('libros', () => {
         return objLibro
     }
 
+    // Obtener libro por nombre
     const obtenerLibroNombre = async (nombre) => {
         let objLibro = {}
 
@@ -119,6 +153,7 @@ export const useLibrosStore = defineStore('libros', () => {
     return {
         catalogo,
         libro,
+        libroEditar,
         agregarLibro,
         editarLibro,
         eliminarLibro,

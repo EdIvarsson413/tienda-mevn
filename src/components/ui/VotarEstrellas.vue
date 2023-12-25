@@ -22,11 +22,12 @@ const props = defineProps({
     nombreLibro: String
 })
 
-// Importaciones
+// ----------- Importaciones ----------- //
 const auth = useAuthStore();
 const valoracion = useValoracionStore();
 
-// Variables reactivas
+
+// ----------- Variables reactivas ----------- //
 const usuario = ref(null);
 const estrellas = ref(0);
 
@@ -39,7 +40,8 @@ onMounted( async () => {
     } catch (error) { console.log(error) }
 })
 
-// Funciones
+
+// ----------- Funciones ----------- //
 const calificar = ( event ) => {
     const obj = {};
 
@@ -50,13 +52,14 @@ const calificar = ( event ) => {
     valoracion.enviarCalificacion(obj)
 }
 
-// Monitoreo
+
+// ----------- Monitoreo ----------- //
 const estrellasTamaño = computed(() => {
     const ancho = window.innerWidth;
     return ancho > 600 && ancho < 960 ? 50 : 40;
 })
 
-
+// Administrador en la pagina?
 const hayAdmin = computed(() => {
     return usuario.value?.role === 'admin' || usuario.value === undefined;
 })

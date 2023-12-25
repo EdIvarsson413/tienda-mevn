@@ -57,9 +57,12 @@ import { reactive } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { error } from '../js/Notificacion'
 
+
+// ----------- Importaciones ----------- //
 const auth = useAuthStore();
 
-// Campos del formulario
+
+// ----------- Variables del formulario ----------- //
 const usuario = reactive({
     nombre: '',
     correo: '',
@@ -82,6 +85,9 @@ const reglas = {
         ( v ) => v === usuario.contraseña || 'Las contraseñas no coinciden',
     ]
 }
+
+
+// ----------- Funciones ----------- //
 
 // Llama del store para registrarse
 const handleSubmit = () => {

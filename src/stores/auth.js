@@ -1,17 +1,14 @@
-import { ref, computed, onMounted, onBeforeMount } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { useRouter } from 'vue-router'
 import { error as errorAlert, ok } from '../js/Notificacion'
 
 export const useAuthStore = defineStore('', () => {
-    //Varibales del store
+    // ----------- Variables del store ----------- //
     const mensaje = ref('');
-    
-    // Uso de dependencias
-    const router = useRouter();
+    const userID = ref('');
 
-    // Funciones (normales)
+    // ----------- Funciones ----------- //
     async function registrar( usuario ) {
         await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/usuarios/registro`,
         {
@@ -43,6 +40,7 @@ export const useAuthStore = defineStore('', () => {
 
             // Se guardan algunos datos en Ls
             localStorage.setItem( 'token', respuesta.jwt );
+            localStorage.setItem( 'lista', 'lista-' + respuesta.nombre)
 
             // Envia al usuario a otra pagina
             setTimeout(() => {
@@ -56,7 +54,7 @@ export const useAuthStore = defineStore('', () => {
 
     async function obtenerUsuario() {
         const token = localStorage.getItem( 'token' );
-
+        
         // Si no hay token en LS
         if( !token ) return;
 

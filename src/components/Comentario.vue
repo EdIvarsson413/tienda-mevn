@@ -8,9 +8,11 @@
                 {{ $props.comentario.nombre }}
             </p>
 
+            <!-- Boton de menu contextual, solo visible para el autor del comentario -->
             <v-btn
                 variant="plain"
                 color="orange-darken-1"
+                v-if="creadorComentario"
             >   
                 <v-icon>mdi-dots-horizontal</v-icon>
 
@@ -47,13 +49,20 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-    comentario: Object
+    comentario: Object,
+    usuario: Object
 })
 
 defineEmits([ 'editar', 'eliminar' ])
 
+// Comentarios formateados <br> en lugar de \n
 const comentarioVHTML = computed(() => {
     return props.comentario.comentario.replace(/\n/g, '<br>');
+})
+
+// Se evalua si el comentario fue hecho por el usaurio actual del sitio
+const creadorComentario = computed(() => {
+    return props.comentario.nombre === props.usuario?.nombre
 })
 
 </script>

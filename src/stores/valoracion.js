@@ -1,19 +1,15 @@
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { ok, error } from '../js/Notificacion'
+import { ok } from '../js/Notificacion'
 
 export const useValoracionStore = defineStore('valoracion', () => {
-    //Varibales del store
+    // ----------- Varibales del store ----------- //
     const comentarios = ref([]);
-
     const route = useRoute();
 
-    onMounted(() => {
-        // obtenerComentarios()
-    })
-
+    // Obtener comentarios por nombre del libro
     const obtenerComentarios = async ( nombreLibro ) => {
         try {
             const { data } = await axios( `${import.meta.env.VITE_BACKEND_URL}/api/comentarios/${nombreLibro}` );
@@ -23,10 +19,9 @@ export const useValoracionStore = defineStore('valoracion', () => {
         }
     }
 
+    // Nuevo comentario  
     const enviarComentario = async ( objComentario ) => {
-        console.log(objComentario)
-
-        await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/comentarios`, 
+        await axios.post( `${import.meta.env.VITE_BACKEND_URL}/api/comentarios`, 
         {
             nombre: objComentario.nombre,
             comentario: objComentario.comentario,
@@ -38,6 +33,30 @@ export const useValoracionStore = defineStore('valoracion', () => {
             .catch( error => {})
     }
 
+    // Editar comentario 
+    const editarComentario = async ( objeto ) => {
+        const { id, comentario } = objeto;
+
+        await axios.put( `${import.meta.env.VITE_BACKEND_URL}/api/comentarios/${id}`,
+        {
+            comentario: comentario
+        })
+            .then( data => {
+                ok( 'Ok ;)', data.data.msg );
+            })
+            .catch( error => {})
+    }
+
+    // Eliminar comentario
+    const eliminarComentario = async ( id ) => {
+        await axios.delete( `${import.meta.env.VITE_BACKEND_URL}/api/comentarios/${id}` )
+            .then( data => {
+                ok( 'Ok ;)', data.data.msg );
+            })
+            .catch( error => {console.log(error)})
+    }
+
+    // Obtener la calificacion de un libro dada por un usuario
     const obtenerCalificacion = async () => {
         let auxEstrellas = 0;
 
@@ -54,6 +73,7 @@ export const useValoracionStore = defineStore('valoracion', () => {
         }
     }
 
+    // Enviar calificacion
     const enviarCalificacion = async ( info ) => {
         axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/estrellas`, {
             nombre: info.nombreUsuario,
@@ -74,6 +94,8 @@ export const useValoracionStore = defineStore('valoracion', () => {
         obtenerCalificacion,
         enviarCalificacion,
         obtenerComentarios,
-        enviarComentario
+        enviarComentario,
+        editarComentario,
+        eliminarComentario
     }
 })

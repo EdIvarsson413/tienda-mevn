@@ -1,75 +1,37 @@
 <template>
-    <v-app-bar app color="orange-darken-1" elevation="0" :height="tamaño">
-        <v-container>
-            <v-row>
-                <!-- Logo -->
-                <v-col sm="12" md="3">
-                    <v-container>
-                        <RouterLink to="/">
-                            <v-img src="/logo.png" width="250" class="mx-auto"/>
-                        </RouterLink>
-                    </v-container>
-                </v-col>
+    <!-- Barra de navegacion en pantallas MD en delante -->
+    <General 
+        v-if="mdAndUp"
+        :usuario="usuario"
+        @handle-sesion="handleSesion"
+    />
 
-                <!-- Campo de texto -->
-                <v-col sm="12" md="6" class="d-flex justify-center align-center">
-                    <v-text-field color="white" label="Buscar" prepend-inner-icon="mdi-magnify" 
-                        variant="outlined" v-model="buscar" autocomplete="off"
-                        @keyup.enter="$router.push({ name: 'buscar', params: { nombre: buscar } })"
-                    />
-                </v-col>
-
-                <!-- Botones -->
-                <v-col md="3" class="d-flex pb-3 justify-center align-center mx-auto">
-                    <p v-if="usuario" class="ml-3 pl-4 text-body-1">{{ usuario.nombre }} </p>
-                    <BotonLink
-                        v-if="!usuario"
-                        text="Iniciar Sesión"
-                        icon="mdi-login"
-                        page-name="iniciar-sesion"
-                    />
-                    <BotonLink
-                        v-if="!usuario"
-                        text="Registrarse"
-                        icon="mdi-account-edit"
-                        page-name="registro"
-                    />
-                    <BotonLink
-                        v-if="usuario && usuario.role === 'user'"
-                        text="Carrito"
-                        icon="mdi-cart"
-                    />
-                    <BotonLink
-                        v-if="usuario && usuario.role === 'admin'"
-                        text="Administrador"
-                        icon="mdi-account-key"
-                        page-name="admin"
-                    />
-                    <BotonLink
-                        v-if="usuario"
-                        text="Cerrar Sesión"
-                        icon="mdi-logout"
-                        @cerrar-sesion="handleSesion"
-                    />
-                </v-col>
-            </v-row>
-        </v-container>
-    </v-app-bar>
+    <!-- Panel de nevegacion en pantallas SM -->
+    <Sm 
+        v-if="sm"
+        :usuario="usuario"
+        @handle-sesion="handleSesion"
+    />
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useDisplay } from 'vuetify'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import BotonLink from './ui/BotonLink.vue'
+import { useCompraStore } from '../stores/compra'
+import General from './layouts/General.vue'
+import Sm from './layouts/Sm.vue'
 
-// Importaciones
+// ----------- Importaciones ----------- //
 const auth = useAuthStore();
-const usuario = ref(null);
-const router = useRouter()
+const compra = useCompraStore();
+const { width, sm, mdAndUp } = useDisplay();
 
-//Variables
-const buscar = ref('');
+
+// ----------- Variables reactivas ----------- //
+const usuario = ref(null);
+
 
 // Al iniciar la app se extraen los datos del usuario actual
 onMounted(async () => {
@@ -88,21 +50,7 @@ onMounted(async () => {
 })
 
 
-// Metodos y monitoreo
-const realizarBusqueda = () => {
-    router.push({ name: 'buscar', params: { nombre: buscar } });
-    window.location.reload()
-}
-
-// Se automatiza el tamaño del navbar
-const tamaño = computed(() => {
-    const innerWidth = window.innerWidth;
-    
-    if( innerWidth >= 600 && innerWidth < 960 ) return 350
-
-    return 150
-})
-
+// ----------- Metodos ----------- //
 // Manejo del logout
 const handleSesion = () => {
     auth.cerrarSesion();

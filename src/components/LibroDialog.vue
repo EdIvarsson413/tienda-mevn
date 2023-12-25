@@ -4,7 +4,9 @@
             <v-card color="grey-darken-3">
                 <!-- Titulo del dialog -->
                 <v-card-title class="text-h5 ma-3 text-start">{{ $props.editando.titulo }}</v-card-title>
-                <v-card-subtitle v-if="estaEditando" class="text-body-2 text-yellow text-end">Los cambios no están guardados correctamente</v-card-subtitle>
+                <v-card-subtitle v-if="estaEditando" class="text-body-2 mx-3 text-yellow text-start">
+                    Vuelva a escribir los campos antiguos y cambie los que desee
+                </v-card-subtitle>
                 
                 <!-- Contenido del dialog -->
                 <v-card-text>
@@ -13,43 +15,44 @@
                             <!-- Espacio para el input del nombre -->
                             <v-col cols="12" sm="6" md="6">
                                 <v-text-field label="Nombre" variant="outlined" color="orange-darken-1"
-                                    v-model="libros.libro.nombre" />
+                                    v-model="libros.libro.nombre" :placeholder="placeEditando('nombre')"/>
                             </v-col>
 
                             <!-- Espacio para el input de la saga -->
                             <v-col cols="12" sm="6" md="6">
                                 <v-text-field label="Saga" variant="outlined" color="orange-darken-1"
-                                    v-model="libros.libro.saga" />
+                                    v-model="libros.libro.saga" :placeholder="placeEditando('saga')"/>
                             </v-col>
 
                             <!-- Espacio para el input del autor -->
                             <v-col cols="12" sm="6" md="6">
                                 <v-text-field label="Autor" variant="outlined" color="orange-darken-1" 
-                                    v-model="libros.libro.autor" />
+                                    v-model="libros.libro.autor" :placeholder="placeEditando('autor')"/>
                             </v-col>
 
                             <!-- Esapcio para el input del precio -->
                             <v-col cols="6">
                                 <v-text-field label="Precio" variant="outlined" color="orange-darken-1" 
-                                    v-model="libros.libro.precio" />
+                                    v-model="libros.libro.precio" :placeholder="placeEditando('precio').toString()"/>
                             </v-col>
 
                             <!-- Espacio para el select de tipo -->
                             <v-col cols="12" sm="6">
                                 <v-autocomplete :items="['libro', 'boxset']" label="Tipo" variant="outlined"
-                                    color="orange-darken-1" v-model="libros.libro.tipo" />
+                                    color="orange-darken-1" v-model="libros.libro.tipo" 
+                                    :placeholder="placeEditando('tipo')"/>
                             </v-col>
                             
                             <!-- Espacio para el token de promocion -->
                             <v-col cols="12" sm="6">
                                 <v-text-field label="ID de promoción" variant="outlined" color="orange-darken-1" 
-                                    v-model="libros.libro.tokenPromo"/>
+                                    v-model="libros.libro.tokenPromo" :placeholder="placeEditando('tokenPromo')"/>
                             </v-col>
 
                             <!-- Espacio para el textarea de la sinopsis -->
                             <v-col cols="12">
                                 <v-textarea label="Sinopsis" variant="outlined" color="orange-darken-1" 
-                                    v-model="libros.libro.sinopsis"/>
+                                    v-model="libros.libro.sinopsis" :placeholder="placeEditando('sinopsis')"/>
                             </v-col>
 
                             <!-- Espacio para el file input de la portada -->
@@ -102,7 +105,7 @@ import { useLibrosStore } from '../stores/libros'
 import { ok, error as errorAlert } from '../js/Notificacion'
 import { validacionAgregar, validacionEditar } from '../js/validaciones'
 
-// Importando store
+// ----------- Importaciones ----------- //
 const libros = useLibrosStore();
 
 const props = defineProps({
@@ -112,12 +115,14 @@ const props = defineProps({
 
 const emits = defineEmits([ 'cerrar-dialog' ])
 
-// Variables reactivas
+
+// ----------- Variables reactivas ----------- //
 const portada = ref(null);
 const nuevoMsgPortada = ref( props.editando.msjPortada );
 const habilitarSubirPortada = ref(true);
 
-// Metodos
+
+// ----------- Funciones ----------- //
 function agregar() {
     // Si la imagen ya fue cargada se rescata el nombre del archivo
     if( portada.value && portada.value.files.length > 0 ){
@@ -133,8 +138,7 @@ function agregar() {
         return
     }
     
-    // Agrega el libro al arreglo y a la base de datos
-    libros.catalogo.push(libros.libro);
+    // Agrega el libro al arreglo(Socket.io) y a la base de datos
     libros.agregarLibro();
     emits('cerrar-dialog');
 }
@@ -151,16 +155,19 @@ function editar() {
         errorAlert( 'Error :(', 'Campos vacios' );
         return;
     }
+    
 
-    // Se sacan los datos de la reactividad
-    const auxLibro = toRaw( libros.libro );
+    // Nuevo objeto a base de los datos nuevos (libros.libro)
+    // y se obtiene el id libroEditar
+    const { _id, ...libroAux } = libros.libro;
+    libroAux._id = libros.libroEditar._id
 
-    // Indexa en el arreglo y reemplaza los datos
-    const index = libros.catalogo.findIndex( libroP => libroP._id === auxLibro._id );
-    libros.catalogo[index] = auxLibro;
+    // // Indexa en el arreglo y reemplaza los datos
+    const index = libros.catalogo.findIndex( libroP => libroP._id === libroAux._id );
+    libros.catalogo[index] = libroAux;
 
-    // Realiza la petición y cierrael dialog
-    libros.editarLibro( auxLibro );
+    // // Realiza la petición y cierra el dialog
+    libros.editarLibro( libroAux );
     emits('cerrar-dialog');
 }
 
@@ -188,7 +195,7 @@ const subirPortada = () => {
         .catch( error => {} )
 }
 
-// Monitoreo
+// ----------- Monitoreo ----------- //
 const btnFuncion = computed(() => { 
     // Si el titulo del dialogo dice Edición retorna la funcion 
     // que permite editar un libro
@@ -197,7 +204,16 @@ const btnFuncion = computed(() => {
     return agregar
 })
 
+// Evalua si el administrador está editando un libro
 const estaEditando = computed(() => {
     return props.editando.titulo.includes( 'Edición' )
 })
+
+/**
+ * Si se esta editando libro, en los placeholder 
+ * se muestran los datos originales
+ */
+const placeEditando = ( campo ) => {
+    return estaEditando.value ? libros.libroEditar[campo] : ''
+}
 </script>
